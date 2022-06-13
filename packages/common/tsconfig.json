@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    // "noImplicitThis": true,
+    "strictNullChecks": true,
+    "lib": ["esnext"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+
+    "useDefineForClassFields": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    // "isolatedModules": true,
+    "skipLibCheck": true,
+    // "importHelpers": false
+    "importHelpers": true,
+
+    "exactOptionalPropertyTypes": false
+    // "exactOptionalPropertyTypes": true
+  },
+  "include": ["src/"],
+  "exclude": ["node_modules"]
+}
