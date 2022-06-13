@@ -6,6 +6,19 @@
   "main": "./dist/cpk-mobx-utils.cjs.js",
   "module": "./dist/cpk-mobx-utils.es.js",
   "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/cpk-mobx-utils.es.js",
+      "require": "./dist/cpk-mobx-utils.cjs.js"
+    }
+  },
+  "files": [
+    "src",
+    "dist",
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md"
+  ],
   "scripts": {
     "test": "vitest watch",
     "build": "vite build"

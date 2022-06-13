@@ -5,6 +5,12 @@
   "main": "./dist/cpk-utils-common.cjs.js",
   "module": "./dist/cpk-utils-common.es.js",
   "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/cpk-utils-common.es.js",
+      "require": "./dist/cpk-utils-common.cjs.js"
+    }
+  },
   "scripts": {
     "test": "vitest watch",
     "build": "vite build"

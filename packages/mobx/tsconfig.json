@@ -19,9 +19,7 @@
     "useDefineForClassFields": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    // "isolatedModules": true,
     "skipLibCheck": true,
-    // "importHelpers": false
     "importHelpers": true,
 
     // "exactOptionalPropertyTypes": false
