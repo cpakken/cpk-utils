@@ -19,7 +19,8 @@ export type KeyObservableCollection<V = any> = Record<string, V> | ObservableMap
 export type ObservableCollection<V = any> = KeyObservableCollection<V> | ObservableSet<V>
 
 export type IKeyCollectionDidChange<T> = ISetDidChange<T> | IMapDidChange<any, T> | IObjectDidChange<any>
-export type MaybeDisposer = (() => void) | void
+export type Disposer = () => void
+export type MaybeDisposer = Disposer | void
 
 export function isObservableCollection(obj: any): obj is ObservableCollection {
   return isObservableObject(obj) || isObservableMap(obj) || isObservableArray(obj) || isObservableSet(obj)
