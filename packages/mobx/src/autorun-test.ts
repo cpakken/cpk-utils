@@ -16,3 +16,5 @@ export function createAutorunTest() {
     },
   })
 }
+
+export const autorunTest = createAutorunTest()

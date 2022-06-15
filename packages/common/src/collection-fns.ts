@@ -28,3 +28,18 @@ export function* mapfilterIter<T, R>(
     if (result !== undefined && result !== null) yield result
   }
 }
+
+export function reduceIter<T, R>(collection: Iterable<T>, fn: (acc: R, item: T) => R, initialValue: R) {
+  let acc = initialValue
+  for (const item of collection) {
+    acc = fn(acc, item)
+  }
+  return acc
+}
+
+export function isTruthy<T>(collection: Iterable<T>, fn: (item: T) => any): boolean {
+  for (const item of collection) {
+    if (!fn(item)) return false
+  }
+  return true
+}
