@@ -9,8 +9,11 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    // "noImplicitThis": true,
+
+    "alwaysStrict": true,
+    "noImplicitThis": true,
     "strictNullChecks": true,
+
     "lib": ["esnext"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,

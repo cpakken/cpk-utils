@@ -1,4 +1,4 @@
-import { observable, when } from 'mobx'
+import { action, observable, when } from 'mobx'
 
 export type ObservableRecorder<T = any> = ((item: T) => T) & {
   show: () => T[]
@@ -15,10 +15,10 @@ export function createObsRecorder<T = any>(): ObservableRecorder<T> {
     return [...list]
   }
 
-  const recorder = (item: T) => {
+  const recorder = action((item: T) => {
     list.push(item)
     return item
-  }
+  })
 
   return Object.assign(recorder, {
     show: () => [...list],
