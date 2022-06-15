@@ -18,11 +18,7 @@ export default defineConfig({
       formats: ['cjs', 'es'],
     },
     rollupOptions: {
-      // external: ['mobx', '@cpk-utils/common'],
-      // external: ['mobx'],
-      // output: {
-      //   globals: { mobx: 'mobx' },
-      // },
+      external: ['util'],
     },
   },
 })

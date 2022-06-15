@@ -1,4 +1,4 @@
-export function mapValues<T extends {}, R>(obj: T, fn: (value: T[keyof T], key: keyof T) => R) {
+export function mapValues<T extends {}, R>(obj: T, fn: (value: T[keyof T & string], key: keyof T & string) => R) {
   const result = {} as Record<keyof T, R>
   for (const key in obj) {
     result[key] = fn(obj[key], key)

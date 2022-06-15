@@ -27,7 +27,7 @@ export function isObservableCollection(obj: any): obj is ObservableCollection {
 }
 
 export function onChildAttachedTo<T>(
-  collection: ObservableCollection,
+  collection: ObservableCollection<T>,
   onAttach: (child: T, key: any, prevChild: T) => (() => void) | void,
   fireForCurrentChildren = true
 ) {
@@ -44,9 +44,9 @@ export type CollectionObserveHandlers<T> = {
   onIndex?: (child: T, newIndex: number, oldIndex: number) => void
 }
 
-export function observeCollection<ItemType>(
-  collection: ObservableCollection,
-  handlers: CollectionObserveHandlers<ItemType>,
+export function observeCollection<T>(
+  collection: ObservableCollection<T>,
+  handlers: CollectionObserveHandlers<T>,
   fireForCurrentChildren = true
 ) {
   const { onAttach, onDetach, onIndex } = handlers
