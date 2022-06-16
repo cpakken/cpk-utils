@@ -16,13 +16,14 @@ export function isFunction<T>(thing: T): thing is T extends Function ? T : never
   // return thing instanceof Function
 }
 
-export function addHiddenProp(instance: any, prop: string | symbol, value: any) {
+export function addHiddenProp<T>(instance: T, prop: string | symbol, value: any): T {
   Object.defineProperty(instance, prop, {
     enumerable: false,
     // configurable: true,
     // writable: true,
     value,
   })
+  return instance
 }
 
 export const noop = () => {}
