@@ -11,7 +11,7 @@ type ITransformerOptions<A, B> = {
   cache?: TransformerCacheMap<A, B>
 }
 
-export function createTransformer<A, B, C>(
+export function createTransformer<A, B>(
   transformer: (key: A) => B,
   options?: ITransformerOptions<A, B>
 ): ITransformer<A, B> {

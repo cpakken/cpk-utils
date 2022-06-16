@@ -39,7 +39,7 @@ export type CollectionObserveHandlers<T> = {
    * @param child added or updated item
    * @param prevChild if defined, then child is 'updated', else 'added'
    */
-  onAttach: (child: T, key: any, prevChild: T | undefined) => (() => void) | void
+  onAttach?: (child: T, key: any, prevChild: T | undefined) => (() => void) | void
   onDetach?: (child: T, key: any) => void
   onIndex?: (child: T, newIndex: number, oldIndex: number) => void
 }
@@ -61,14 +61,14 @@ export function observeCollection<T>(
 //Non-array collections (uses keys instead of indexies)
 function observeMobxKeyCollection<T>(
   collection: Object | ObservableMap<any, T> | ObservableSet<T>,
-  onAttach: (child: T, key: string | T, prev?: T) => MaybeDisposer,
+  onAttach?: (child: T, key: string | T, prev?: T) => MaybeDisposer,
   onDetach?: (child: T, key: string | T) => void,
   fireForCurrentChildren = true
 ) {
   const disposers: Map<PropertyKey | T, MaybeDisposer> = new Map()
 
   //Since mobx observe does not support fireImmediately for objects, do manually
-  if (fireForCurrentChildren) {
+  if (fireForCurrentChildren && onAttach) {
     if (isObservableSet(collection)) {
       for (const item of collection) {
         disposers.set(item, onAttach(item, item))
@@ -86,7 +86,7 @@ function observeMobxKeyCollection<T>(
       case 'add': {
         const key = change.observableKind === 'set' ? change.newValue : change.name
 
-        disposers.set(key, onAttach(change.newValue, key))
+        if (onAttach) disposers.set(key, onAttach(change.newValue, key))
         break
       }
       case 'update':
@@ -96,7 +96,7 @@ function observeMobxKeyCollection<T>(
         disposers.delete(change.name)
 
         //init new value
-        disposers.set(change.name, onAttach(change.newValue, change.name, change.oldValue))
+        if (onAttach) disposers.set(change.name, onAttach(change.newValue, change.name, change.oldValue))
         break
 
       case 'delete': // map
@@ -124,13 +124,13 @@ function observeMobxKeyCollection<T>(
 
 function observeMobxArray<T>(
   array: IObservableArray<T>,
-  onAttach: (child: T, index: number, prev?: T) => MaybeDisposer,
+  onAttach?: (child: T, index: number, prev?: T) => MaybeDisposer,
   onDetach?: (child: T, orginalIndex: number) => void,
   onIndex?: (child: T, newIndex: number, oldIndex: number) => void,
   fireForCurrentChildren = true
 ) {
   const disposers: Array<MaybeDisposer> = []
-  if (fireForCurrentChildren) {
+  if (fireForCurrentChildren && onAttach) {
     array.forEach((item, index) => disposers.push(onAttach(item, index)))
   }
 
@@ -139,12 +139,14 @@ function observeMobxArray<T>(
 
     switch (change.type) {
       case 'update':
-        //dispose old value
-        disposers[index]?.()
-        disposers[index] = undefined
+        if (onAttach) {
+          //dispose old value
+          disposers[index]?.()
+          disposers[index] = undefined
 
-        //init new value
-        disposers[index] = onAttach(change.newValue, index, change.oldValue)
+          //init new value
+          disposers[index] = onAttach(change.newValue, index, change.oldValue)
+        }
         break
       case 'splice':
         //Update indexes
@@ -163,11 +165,14 @@ function observeMobxArray<T>(
           disposers[i]?.()
           onDetach?.(item, i)
         })
-        disposers.splice(change.index, change.removedCount)
 
-        //Init added items
-        const addedDisposers = change.added.map((item, offsetIndex) => onAttach(item, index + offsetIndex))
-        disposers.splice(change.index, 0, ...addedDisposers)
+        if (onAttach) {
+          //Sync disposer index
+          disposers.splice(change.index, change.removedCount)
+          //Init added items
+          const addedDisposers = change.added.map((item, offsetIndex) => onAttach(item, index + offsetIndex))
+          disposers.splice(change.index, 0, ...addedDisposers)
+        }
 
         break
     }
