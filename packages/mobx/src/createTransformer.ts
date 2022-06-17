@@ -1,7 +1,7 @@
+import { addHiddenProp } from '@cpk-utils/common'
 import { computed, onBecomeUnobserved, IComputedValue } from 'mobx'
 
 //Used to identify transformer type
-export type ITransformer<A, B> = ((object: A) => B) & { cache: TransformerCacheMap<A, B> }
 
 export type TransformerCacheMap<A, B> = Map<A, IComputedValue<B>>
 
@@ -11,17 +11,19 @@ type ITransformerOptions<A, B> = {
   cache?: TransformerCacheMap<A, B>
 }
 
-export function createTransformer<A, B>(
-  transformer: (key: A) => B,
-  options?: ITransformerOptions<A, B>
-): ITransformer<A, B> {
+const $transformer = Symbol('transformer')
+
+export function createTransformer<FN extends (arg: any) => any>(
+  transformer: FN,
+  options?: ITransformerOptions<Parameters<FN>, ReturnType<FN>>
+): FN {
   if (!(typeof transformer === 'function' && transformer.length < 2))
     throw new Error('createTransformer expects a function that accepts one argument')
 
   const { requiresReaction = false, onCleanup, cache = new Map() } = options || { cache: new Map() }
 
-  function createView(source: A) {
-    let latestValue: B
+  function createView(source: Parameters<FN>) {
+    let latestValue: ReturnType<FN>
     const expr = computed(() => (latestValue = transformer(source)), { requiresReaction })
     const disposer = onBecomeUnobserved(expr, () => {
       cache.delete(source)
@@ -31,8 +33,8 @@ export function createTransformer<A, B>(
     return expr
   }
 
-  return Object.assign(
-    (key: A) => {
+  return addHiddenProp(
+    (key: any) => {
       //in cache
       let cacheComputed = cache.get(key)
       if (cacheComputed) return cacheComputed.get()
@@ -43,6 +45,11 @@ export function createTransformer<A, B>(
 
       return cacheComputed.get()
     },
-    { cache }
-  )
+    $transformer,
+    cache
+  ) as FN
+}
+
+export function isTransformer(fn: (arg: any) => any): boolean {
+  return Boolean(fn[$transformer])
 }
