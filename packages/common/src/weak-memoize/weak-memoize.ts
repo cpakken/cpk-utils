@@ -1,25 +1,31 @@
 import { isNonPrimative } from '../common'
 
+type Cache = WeakMap<any, any>
+
+// Used to access the cache of a memoized function
+const weakMemoedFnCache = new WeakMap<Function, Cache>()
+//Key in cache to store replace cache setter fn
+const $replace = {} //Since we can't use symbol as weakmap key, we use an object to represent it
+
 /**
  * Weakly memoize a function with zero/one arguments. Caches the result if the argument is non-primative
  * @param fn function to be weakly memoized
  * @returns memoized function
  */
 export function weakMemo<FN extends (arg?: any) => any>(fn: FN): FN {
-  const cache = new WeakMap<any, any>()
+  let cache: Cache = new WeakMap()
 
-  return function (arg?: any) {
+  function memoed(arg?: any) {
     if (arguments.length === 0) {
       //If no arguments, use own fn as key
-      if (cache.has(fn)) {
-        return cache.get(fn)!
+      if (cache.has(memoed)) {
+        return cache.get(memoed)!
       } else {
         const result = fn()
-        cache.set(fn, result)
+        cache.set(memoed, result)
         return result
       }
     }
-    // if (arg instanceof Object) {
     if (isNonPrimative(arg)) {
       if (cache.has(arg)) {
         return cache.get(arg)!
@@ -32,5 +38,21 @@ export function weakMemo<FN extends (arg?: any) => any>(fn: FN): FN {
       //Don't memoize primitives
       return fn(arg)
     }
-  } as FN
+  }
+
+  weakMemoedFnCache.set(memoed, cache)
+  cache.set($replace, () => (cache = new WeakMap()))
+
+  return memoed as FN
+}
+
+export function clearMemo(memoedFn: (arg?: any) => any, arg?: object) {
+  const cache = weakMemoedFnCache.get(memoedFn)
+  if (cache) {
+    if (arg) {
+      cache.delete(arg)
+    } else {
+      cache.get($replace)()
+    }
+  }
 }

@@ -66,10 +66,10 @@ export function isWeakMemoizedFn(fn: (...args: any[]) => any): boolean {
   return Boolean(fn && fn[$memoize])
 }
 
-export function clearMemoizedCache(fn: (...args: any[]) => any) {
-  if (isWeakMemoizedFn(fn)) {
-    fn[$memoize].clear()
-  }
-}
+// export function clearMemoizedCache(fn: (...args: any[]) => any) {
+//   if (isWeakMemoizedFn(fn)) {
+//     fn[$memoize].clear() //TODO cannot clear WeakMap
+//   }
+// }
 
 //TODO if more than one argument, store recursive function

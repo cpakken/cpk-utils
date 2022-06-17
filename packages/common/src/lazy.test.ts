@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { lazy } from './lazy'
+import { lazy, resetLazy } from './lazy'
 
 test('lazy decorator', () => {
   class TestClass {
@@ -32,4 +32,11 @@ test('lazy decorator', () => {
   expect(t.normal.count).toBe(1)
   expect(t.normal.count).toBe(2)
   expect(t.normal.count).toBe(3)
+
+  resetLazy(t, 'lazy')
+  expect(t.lazy.count).toBe(2)
+  expect(t.lazy.count).toBe(2)
+
+  resetLazy(t, 'lazy')
+  expect(t.lazy.count).toBe(3)
 })
