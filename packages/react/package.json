@@ -1,0 +1,25 @@
+{
+  "name": "@cpk-utils/react",
+  "version": "0.0.1",
+  "main": "src/index.ts",
+  "scripts": {
+    "//build": "vite build",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/react": "17",
+    "@types/react-dom": "17",
+    "react": "^17",
+    "react-dom": "^17",
+    "vite": "^2.9.12",
+    "vite-plugin-dts": "^1.2.0",
+    "vitest": "^0.14.2"
+  },
+  "peerDependencies": {
+    "react": "^17"
+  },
+  "dependencies": {
+    "@radix-ui/react-use-layout-effect": "^0.1.0",
+    "react-merge-refs": "^1.1.0"
+  }
+}
