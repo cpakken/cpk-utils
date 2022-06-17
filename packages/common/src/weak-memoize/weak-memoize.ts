@@ -1,6 +1,6 @@
 import { isNonPrimative } from '../common'
 
-type Cache = WeakMap<any, any>
+type Cache = WeakMap<object, any>
 
 // Used to access the cache of a memoized function
 const weakMemoedFnCache = new WeakMap<Function, Cache>()
@@ -46,13 +46,15 @@ export function weakMemo<FN extends (arg?: any) => any>(fn: FN): FN {
   return memoed as FN
 }
 
-export function clearMemo(memoedFn: (arg?: any) => any, arg?: object) {
+/**
+ * Clear the memoized cache of a function. Can specify an argument to clear the cache for that argument
+ * @param memoedFn memoized function
+ * @param arg if arg is undefined, clear result with no arguments. If arg is missing, clear all results
+ */
+export function clearWeakMemo(memoedFn: (arg?: any) => any, arg?: object) {
   const cache = weakMemoedFnCache.get(memoedFn)
   if (cache) {
-    if (arg) {
-      cache.delete(arg)
-    } else {
-      cache.get($replace)()
-    }
+    if (arguments.length > 1) cache.delete(arg === undefined ? memoedFn : arg)
+    else cache.get($replace)()
   }
 }

@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest'
-import { clearMemo, weakMemo } from './weak-memoize'
+import { clearWeakMemo, weakMemo } from './weak-memoize'
 
 test('memoize no arguments', () => {
   const mock = vi.fn()
@@ -29,11 +29,11 @@ test('memoize one argument', () => {
 
   expect(mock).toBeCalledTimes(1)
 
-  clearMemo(add3, obj)
+  clearWeakMemo(add3, obj)
   add3(obj)
   expect(mock).toBeCalledTimes(2)
 
-  clearMemo(add3)
+  clearWeakMemo(add3)
   add3(obj)
   expect(mock).toBeCalledTimes(3)
 })
