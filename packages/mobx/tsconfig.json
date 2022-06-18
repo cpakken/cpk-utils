@@ -13,6 +13,7 @@
     "alwaysStrict": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
+    "strictFunctionTypes": true,
 
     "lib": ["esnext"],
     "noUnusedLocals": true,

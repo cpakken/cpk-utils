@@ -19,6 +19,7 @@ export default defineConfig({
     },
     rollupOptions: {
       external: ['util'],
+      // output: {preserveModules: true},
     },
   },
 })

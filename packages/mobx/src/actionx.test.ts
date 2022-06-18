@@ -3,6 +3,8 @@ import { expect, test, vi } from 'vitest'
 import { actionx } from './actionx'
 
 test('actionx', () => {
+  //Mobx will warn if you modify list without actions
+  //make sure warnSpy is not called if actionx works
   const warnSpy = vi.spyOn(console, 'warn')
 
   class A {

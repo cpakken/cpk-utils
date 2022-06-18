@@ -1,9 +1,26 @@
 {
   "name": "@cpk-utils/react",
   "version": "0.0.1",
-  "main": "src/index.ts",
+  "sideEffects": false,
+  "//main": "src/index.ts",
+  "main": "./dist/cpk-react-utils.cjs.js",
+  "module": "./dist/cpk-react-utils.es.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/cpk-react-utils.es.js",
+      "require": "./dist/cpk-react-utils.cjs.js"
+    }
+  },
+  "files": [
+    "src",
+    "dist",
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md"
+  ],
   "scripts": {
-    "//build": "vite build",
+    "build": "vite build",
     "test": "vitest"
   },
   "devDependencies": {
