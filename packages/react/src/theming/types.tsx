@@ -16,6 +16,8 @@ export interface ThemeProviderProps {
 
   /** Element where class name is updated, defaults to `document.documentElement` */
   element?: HTMLElement
+
+  children?: React.ReactNode
 }
 
 export interface UseThemeProps {

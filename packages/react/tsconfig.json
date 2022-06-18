@@ -15,7 +15,7 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
 
-    "lib": ["esnext"],
+    "lib": ["esnext", "dom"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "resolveJsonModule": true,
@@ -27,7 +27,8 @@
     "importHelpers": true,
 
     // "exactOptionalPropertyTypes": false
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+    "jsx": "react-jsx"
   },
   "include": ["src/"],
   "exclude": ["node_modules"]

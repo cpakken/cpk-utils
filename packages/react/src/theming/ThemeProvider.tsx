@@ -3,7 +3,7 @@
 // https://github.com/donavon/use-dark-mode
 // https://usehooks.com/useDarkMode
 
-import { createContext, FC, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createContext, FC, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ColorMode, ColorThemes, ThemeProviderProps, UseThemeProps } from './types'
 import { useLocalStorage, useUpdateClassName, useConstant } from '../hooks'
 
@@ -73,7 +73,7 @@ export const useThemeContainer = (initialColorMode: ColorMode, overideColorTheme
   const { colorThemes: _colorThemes } = useTheme()
   const colorThemes = overideColorThemes ?? _colorThemes
 
-  const ThemeContainer: FC<{}> = useMemo(
+  const ThemeContainer: FC<{ children: React.ReactNode }> = useMemo(
     () =>
       ({ children }) => {
         const [colorMode, setColorMode] = useState(initialColorMode)

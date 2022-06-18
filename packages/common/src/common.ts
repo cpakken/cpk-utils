@@ -1,5 +1,6 @@
 export type Primatives = string | number | boolean | symbol | undefined | null | bigint
-export type NonPrimative<T> = T extends Primatives ? never : T
+// export type NonPrimative<T> = T extends Primatives ? never : T
+export type NonPrimative<T> = T extends object ? T : never
 
 // const primativeTypes = new Set(['string', 'number', 'boolean', 'symbol', 'undefined', 'null', 'bigint'])
 const nonPrimativeTypes = new Set(['object', 'function'])
