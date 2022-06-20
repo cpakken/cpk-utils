@@ -13,30 +13,8 @@ export interface BaseMap<K, V> extends ReadOnlyMapProps<K, V> {
   delete(key: K): boolean
 }
 
-// export function isBaseMap<K, V>(test: BaseMap<K, V> | ReadOnlyMap<K, V>): test is BaseMap<K, V> {
-//   return (test as any).set instanceof Function
-// }
-
-// export abstract class MapProps<K, V> implements ReadOnlyMapProps<K, V> {
-//   abstract get size(): number
-//   abstract get(key: any): V | undefined
-//   abstract has(key: any): boolean
-//   abstract keys(): IterableIterator<K>
-//   *values(): IterableIterator<V> {
-//     for (let k of this.keys()) yield this.get(k) as V
-//   }
-//   *entries(): IterableIterator<[K, V]> {
-//     for (let k of this.keys()) yield [k, this.get(k) as V]
-//   }
-//   forEach(fn: (v: V, k: K) => void) {
-//     for (const [key, value] of this.entries()) fn(value, key)
-//   }
-// }
-
-export class DerivedMap<K, P, V> {
+export class DerivedMap<K, P, V> implements ReadOnlyMapProps<K, V> {
   base: ReadOnlyMapProps<K, P>
-
-  // abstract get(key: any): V | undefined
 
   constructor(map: ReadOnlyMapProps<K, P>, readonly get: (key: K) => V | undefined) {
     this.base = map
@@ -58,7 +36,13 @@ export class DerivedMap<K, P, V> {
   *entries(): IterableIterator<[K, V]> {
     for (let k of this.keys()) yield [k, this.get(k) as V]
   }
-  forEach(fn: (v: V, k: K) => void) {
-    for (const [key, value] of this.entries()) fn(value, key)
+  forEach(fn: (value: V, key: K, map: DerivedMap<K, P, V>) => void) {
+    for (const [key, value] of this.entries()) fn(value, key, this)
   }
+}
+
+export function deriveMap<K, P, V>(map: ReadOnlyMapProps<K, P>, mapFn: (value: P, key: K) => V): DerivedMap<K, P, V> {
+  return new DerivedMap(map, (key) => {
+    return map.has(key) ? mapFn(map.get(key)!, key) : undefined
+  })
 }

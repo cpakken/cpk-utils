@@ -9,6 +9,7 @@ export * from './memoize'
 export * from './lazy'
 export * from './object-deep'
 export * from './derived-map'
+export * from './lazy-store'
 
 //Testing Utils
 export * from './log-depth'
