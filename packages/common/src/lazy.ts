@@ -1,21 +1,20 @@
-type InstanceMap = WeakMap<object, any>
-const lazyMemoMap = new WeakMap<() => any, InstanceMap>()
+type InstanceCache = WeakMap<object, any>
+const lazyMemoMap = new WeakMap<() => any, InstanceCache>()
 
 function _createLazy<T>(fn: () => T): () => T {
-  const instanceMap: InstanceMap = new WeakMap()
+  const instanceCache: InstanceCache = new WeakMap()
 
-  function lazyFn() {
-    const cache = instanceMap.get(this)
-    if (cache === undefined) {
-      const result = fn.apply(this)
-      instanceMap.set(this, result)
-      return result
+  function lazyFn(this: object) {
+    if (instanceCache.has(this)) {
+      return instanceCache.get(this)
     } else {
-      return cache
+      const result = fn.apply(this)
+      instanceCache.set(this, result)
+      return result
     }
   }
 
-  lazyMemoMap.set(lazyFn, instanceMap)
+  lazyMemoMap.set(lazyFn, instanceCache)
   return lazyFn
 }
 
