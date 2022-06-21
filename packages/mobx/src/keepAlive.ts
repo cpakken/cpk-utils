@@ -2,7 +2,7 @@
 
 import { noop } from '@cpk-utils/common'
 import { IComputedValue, getAtom, observe } from 'mobx'
-import type { Disposer } from './observe-collection'
+import type { Disposer } from './types'
 
 export function keepAlive(target: Object, property: string): Disposer
 export function keepAlive(computedValue: IComputedValue<any>): Disposer

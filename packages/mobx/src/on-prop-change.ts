@@ -1,6 +1,6 @@
 import { isFunction } from '@cpk-utils/common'
 import { IObservableValue, _getAdministration } from 'mobx'
-import type { Disposer, MaybeDisposer } from './observe-collection'
+import type { Disposer, MaybeDisposer } from './types'
 
 export function onPropChange<T, K extends keyof T>(
   observable: IObservableValue<T>,

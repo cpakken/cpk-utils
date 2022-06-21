@@ -14,21 +14,19 @@ import {
   ObservableSet,
   observe,
 } from 'mobx'
+import type { MaybeDisposer } from './types'
 
 export type KeyObservableCollection<V = any> = Record<string, V> | ObservableMap<string, V> | IObservableArray<V>
 export type ObservableCollection<V = any> = KeyObservableCollection<V> | ObservableSet<V>
 
 export type IKeyCollectionDidChange<T> = ISetDidChange<T> | IMapDidChange<any, T> | IObjectDidChange<any>
-export type Disposer = () => void
-export type MaybeDisposer = Disposer | void
-
 export function isObservableCollection(obj: any): obj is ObservableCollection {
   return isObservableObject(obj) || isObservableMap(obj) || isObservableArray(obj) || isObservableSet(obj)
 }
 
 export function onChildAttachedTo<T>(
   collection: ObservableCollection<T>,
-  onAttach: (child: T, key: any, prevChild: T) => (() => void) | void,
+  onAttach: (child: T, key: any, prevChild: T | undefined) => (() => void) | void,
   fireForCurrentChildren = true
 ) {
   return observeCollection(collection, { onAttach }, fireForCurrentChildren)
