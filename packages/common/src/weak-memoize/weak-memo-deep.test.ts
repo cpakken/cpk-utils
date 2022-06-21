@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest'
-import { isWeakMemoizedFn, weakMemoDeep } from './weak-memo-deep'
+import { isWeakMemoDeepFn, weakMemoDeep } from './weak-memo-deep'
 
 describe('weak-memoize-recursive', () => {
   test('basic', () => {
@@ -8,8 +8,8 @@ describe('weak-memoize-recursive', () => {
     const _memoized = weakMemoDeep(fn)
     const memoized = vi.fn(_memoized)
 
-    expect(isWeakMemoizedFn(_memoized)).toBe(true)
-    expect(isWeakMemoizedFn(fn)).toBe(false)
+    expect(isWeakMemoDeepFn(_memoized)).toBe(true)
+    expect(isWeakMemoDeepFn(fn)).toBe(false)
 
     //Primative arguments are not memoized
     memoized(1, 2, 3)

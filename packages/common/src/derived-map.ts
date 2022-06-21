@@ -1,7 +1,7 @@
 export interface ReadOnlyMapProps<K, V> {
   readonly size: number
-  has(key: any): boolean
-  get(key: any): V | undefined
+  has(key: K): boolean
+  get(key: K): V | undefined
   keys(): IterableIterator<K>
   // values(): IterableIterator<V>
   // entries(): IterableIterator<[K, V]>
@@ -14,11 +14,7 @@ export interface BaseMap<K, V> extends ReadOnlyMapProps<K, V> {
 }
 
 export class DerivedMap<K, P, V> implements ReadOnlyMapProps<K, V> {
-  base: ReadOnlyMapProps<K, P>
-
-  constructor(map: ReadOnlyMapProps<K, P>, readonly get: (key: K) => V | undefined) {
-    this.base = map
-  }
+  constructor(readonly base: ReadOnlyMapProps<K, P>, readonly get: (key: K) => V | undefined) {}
 
   get size() {
     return this.base.size

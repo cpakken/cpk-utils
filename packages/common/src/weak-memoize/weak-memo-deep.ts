@@ -1,75 +1,85 @@
-import { isNonPrimative } from '../common'
+import { isPrimative } from '../common'
+
+type Cache = WeakMap<object, any>
+
+const $noArg = {}
+const $init = {}
+const memoFnCacheMap = new WeakMap<Function, Cache>()
 
 /**
  * When the arguments are non-primative, the result is cached
  * @param fn function to be weakly memoized
  * @returns memoized function
  */
-export function weakMemoDeep<FN extends (...args: any[]) => any>(fn: FN, cache = new WeakMap()): FN {
+export function weakMemoDeep<FN extends (...args: any[]) => any>(fn: FN, _cache?: Cache): FN {
+  let cache: Cache
+  //Used to reset cache since .clear() is unavailable in WeakMap
+  const initCache = (_cache?: Cache) => {
+    cache = _cache || new WeakMap([[$init, initCache]])
+    memoFnCacheMap.set(memoized, cache)
+  }
+
   function memoized(...args) {
     const arg = args[0]
 
     if (args.length === 0) {
-      //If no arguments, use own fn as key (result is garbage collected when fn is)
-      if (cache.has(fn)) {
-        return cache.get(fn)!
+      //If no arguments, use $noArg as key
+      if (cache.has($noArg)) {
+        return cache.get($noArg)!
       } else {
         const result = fn()
-        cache.set(fn, result)
+        cache.set($noArg, result)
         return result
       }
-    } else if (isNonPrimative(arg)) {
-      if (args.length === 1) {
-        if (cache.has(arg)) {
-          const resultOrFn = cache.get(arg)!
-          return isWeakMemoizedFn(resultOrFn) ? resultOrFn() : resultOrFn
-        } else {
-          const result = fn(arg)
-          cache.set(arg, result)
-          return result
-        }
+    }
+    if (args.length === 1) {
+      if (cache.has(arg)) {
+        const resultOrFn = cache.get(arg)!
+        return isWeakMemoDeepFn(resultOrFn) ? resultOrFn() : resultOrFn
       } else {
-        //Arguments > 1
-        if (cache.has(arg)) {
-          const resultOrFn = cache.get(arg)
-          if (isWeakMemoizedFn(resultOrFn)) {
-            //memoed is the curried memoized function
-            return resultOrFn(...args.slice(1))
-          } else {
-            //create and cache curried memoized fn with 0 arguments result initialized (own function is used as key)
-            const _curried = (...args: any[]) => fn(arg, ...args)
-            const curried = weakMemoDeep(_curried, new WeakMap([[_curried, resultOrFn]]))
+        if (isPrimative(arg)) return fn(arg) //Don't memoize primitives
 
-            cache.set(arg, curried)
-            return curried(...args.slice(1))
-          }
-        } else {
-          //create and cache curried memoized fn
-          const nextFn = weakMemoDeep((...args) => fn(arg, ...args))
-          cache.set(arg, nextFn)
-          return nextFn(...args.slice(1))
-        }
+        const result = fn(arg)
+        cache.set(arg, result)
+        return result
       }
     } else {
-      //Don't memoize primitives
-      return fn(...args)
+      //Arguments > 1
+      if (cache.has(arg)) {
+        const resultOrFn = cache.get(arg)
+        if (isWeakMemoDeepFn(resultOrFn)) {
+          //memoed is the curried memoized function
+          return resultOrFn(...args.slice(1))
+        } else {
+          //create and cache curried memoized fn with 0 arguments result initialized (own function is used as key)
+          const curried = weakMemoDeep((...args: any[]) => fn(arg, ...args), new WeakMap([[$noArg, resultOrFn]]))
+
+          cache.set(arg, curried)
+          return curried(...args.slice(1))
+        }
+      } else {
+        if (isPrimative(arg)) return fn(...args) //Don't memoize primitives
+
+        //create and cache curried memoized fn
+        const nextFn = weakMemoDeep((...args) => fn(arg, ...args))
+        cache.set(arg, nextFn)
+        return nextFn(...args.slice(1))
+      }
     }
   }
 
-  return Object.assign(memoized, { [$memoize]: cache }) as any
-  // return Object.defineProperty(memoized, $memoize, { value: cache }) as any
+  // memoFnCacheMap.set(memoized, cache)
+  initCache(_cache)
+  return memoized as FN
 }
 
-const $memoize = Symbol('memoize')
-
-export function isWeakMemoizedFn(fn: (...args: any[]) => any): boolean {
-  return Boolean(fn && fn[$memoize])
+export function isWeakMemoDeepFn(memoedFn: (...args: any[]) => any): boolean {
+  return memoedFn && memoFnCacheMap.has(memoedFn)
 }
 
-// export function clearMemoizedCache(fn: (...args: any[]) => any) {
-//   if (isWeakMemoizedFn(fn)) {
-//     fn[$memoize].clear() //TODO cannot clear WeakMap
-//   }
-// }
-
-//TODO if more than one argument, store recursive function
+//TODO test this
+export function clearWeakMemoDeep(fn: (...args: any[]) => any) {
+  if (isWeakMemoDeepFn(fn)) {
+    memoFnCacheMap.get(fn)!.get($init)()
+  }
+}

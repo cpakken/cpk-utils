@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { lazy, resetLazy } from './lazy'
+import { lazy, resetLazy } from './lazy-decorator'
 
 test('lazy decorator', () => {
   class TestClass {

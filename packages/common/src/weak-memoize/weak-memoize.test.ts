@@ -29,6 +29,7 @@ test('memoize one argument', () => {
 
   expect(mock).toBeCalledTimes(1)
 
+  expect(() => clearWeakMemo(mock, obj)).toThrow() //Throw since mock is not a memoized function
   clearWeakMemo(add3, obj)
   add3(obj)
   expect(mock).toBeCalledTimes(2)
