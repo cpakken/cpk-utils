@@ -34,8 +34,8 @@ type SyncActive<T> = {
 export class SyncObservable<S, V = S> {
   private active: SyncActive<V> | null = null
 
-  value: V
-  oldValue: V | undefined
+  declare value: V
+  declare oldValue: V | undefined
   isDisposed: boolean = false
 
   constructor(

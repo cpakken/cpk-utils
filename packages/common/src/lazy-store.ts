@@ -2,13 +2,10 @@ import { DerivedMap, ReadOnlyMapProps } from './derived-map'
 import { clearWeakMemo, weakMemo } from './weak-memoize'
 
 export class LazyMap<K, P, V> extends DerivedMap<K, P, V> {
-  readonly mapFn: (parentValue: P) => V
+  declare readonly mapFn: (parentValue: P) => V
 
   constructor(base: ReadOnlyMapProps<K, P>, mapFn: (parentValue: P) => V) {
-    const memoedMapFn = weakMemo(mapFn)
-    super(base, (key) => (base.has(key) ? memoedMapFn(base.get(key)!) : undefined))
-
-    this.mapFn = memoedMapFn
+    super(base, weakMemo(mapFn))
   }
 
   reset(...keyArg: [K] | []) {

@@ -14,7 +14,11 @@ export interface BaseMap<K, V> extends ReadOnlyMapProps<K, V> {
 }
 
 export class DerivedMap<K, P, V> implements ReadOnlyMapProps<K, V> {
-  constructor(readonly base: ReadOnlyMapProps<K, P>, readonly get: (key: K) => V | undefined) {}
+  declare get: (key: K) => V | undefined
+
+  constructor(readonly base: ReadOnlyMapProps<K, P>, readonly mapFn: (value: P, key: K) => V | undefined) {
+    this.get = (key: K) => (base.has(key) ? mapFn(base.get(key)!, key) : undefined)
+  }
 
   get size() {
     return this.base.size
@@ -35,10 +39,4 @@ export class DerivedMap<K, P, V> implements ReadOnlyMapProps<K, V> {
   forEach(fn: (value: V, key: K, map: DerivedMap<K, P, V>) => void) {
     for (const [key, value] of this.entries()) fn(value, key, this)
   }
-}
-
-export function deriveMap<K, P, V>(map: ReadOnlyMapProps<K, P>, mapFn: (value: P, key: K) => V): DerivedMap<K, P, V> {
-  return new DerivedMap(map, (key) => {
-    return map.has(key) ? mapFn(map.get(key)!, key) : undefined
-  })
 }
