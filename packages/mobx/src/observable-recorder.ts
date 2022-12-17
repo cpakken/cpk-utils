@@ -11,7 +11,6 @@ export function createObsRecorder<T = any>(): ObservableRecorder<T> {
 
   const waitUntil = async (predicate: (last: T, list: T[]) => any) => {
     await when(() => Boolean(predicate(list.at(-1)!, list)))
-    // await when(() => Boolean(predicate(list[list.length - 1], list)))
     return [...list]
   }
 

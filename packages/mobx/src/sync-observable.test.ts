@@ -1,5 +1,4 @@
 import { autorun, observable, observe, runInAction } from 'mobx'
-import { expect, test, vi } from 'vitest'
 import { syncObservable } from './sync-observable'
 
 test('syncObservable', () => {

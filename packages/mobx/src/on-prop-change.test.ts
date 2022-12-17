@@ -1,5 +1,4 @@
 import { observable } from 'mobx'
-import { expect, test, vi } from 'vitest'
 import { onPropChange } from './on-prop-change'
 
 test('observable', () => {

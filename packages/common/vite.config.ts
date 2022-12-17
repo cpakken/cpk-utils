@@ -1,4 +1,3 @@
-import path from 'path'
 import dts from 'vite-plugin-dts'
 import { defineConfig } from 'vitest/config'
 
@@ -8,17 +7,18 @@ export default defineConfig({
       outputDir: './dist/types',
       entryRoot: './src',
       skipDiagnostics: false,
+      exclude: ['**/vite-env.d.ts'],
     }),
   ],
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'src/index.ts'),
-      name: 'cpk-utils-common',
-      fileName: (format) => `cpk-utils-common.${format}.js`,
+      entry: 'src/index.ts',
       formats: ['cjs', 'es'],
+      name: 'index',
+      fileName: 'index',
     },
     rollupOptions: {
-      external: ['util'],
+      external: ['node:util'],
       // output: {preserveModules: true},
     },
   },

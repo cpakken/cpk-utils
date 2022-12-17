@@ -1,4 +1,4 @@
-import util from 'util'
+import util from 'node:util'
 
 export function logDepth(...args: any[]) {
   return (depth = 5) => {

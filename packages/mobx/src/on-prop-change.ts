@@ -2,6 +2,12 @@ import { isFunction } from '@cpk-utils/common'
 import { IObservableValue, _getAdministration } from 'mobx'
 import type { Disposer, MaybeDisposer } from './types'
 
+/**
+ *
+ * @param observable
+ * @param fn
+ * @param fireForCurrentValue defaults to true
+ */
 export function onPropChange<T, K extends keyof T>(
   observable: IObservableValue<T>,
   fn: (newValue: T, oldValue: T | undefined) => MaybeDisposer,

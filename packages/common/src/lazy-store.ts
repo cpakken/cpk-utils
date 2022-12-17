@@ -10,7 +10,7 @@ export class LazyMap<K, P, V> extends DerivedMap<K, P, V> {
 
   reset(...keyArg: [K] | []) {
     //spread key since clearWeakMemo will clear all if it has no key
-    return clearWeakMemo(this.mapFn, ...keyArg.map((key: K) => this.base.get(key)!))
+    return clearWeakMemo(this.mapFn, ...keyArg.map((key: K) => this.base.get(key)! as any))
   }
 }
 
