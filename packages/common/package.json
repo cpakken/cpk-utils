@@ -4,11 +4,14 @@
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
-  "types": "./dist/types/index.d.ts",
+  "//types": "./dist/types/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "//import": "./dist/index.js",
+      "//require": "./dist/index.cjs"
     }
   },
   "scripts": {

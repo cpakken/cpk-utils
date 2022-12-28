@@ -16,7 +16,7 @@ import {
 } from 'mobx'
 import type { MaybeDisposer } from './types'
 
-export type KeyObservableCollection<V = any> = Record<string, V> | ObservableMap<string, V> | IObservableArray<V>
+export type KeyObservableCollection<V = any> = Record<string, V> | ObservableMap<any, V> | IObservableArray<V>
 export type ObservableCollection<V = any> = KeyObservableCollection<V> | ObservableSet<V>
 
 export type IKeyCollectionDidChange<T> = ISetDidChange<T> | IMapDidChange<any, T> | IObjectDidChange<any>
@@ -42,6 +42,13 @@ export type CollectionObserveHandlers<T> = {
   onIndex?: (child: T, newIndex: number, oldIndex: number) => void
 }
 
+/**
+ *
+ * @param collection
+ * @param handlers
+ * @param fireForCurrentChildren @default true
+ * @returns
+ */
 export function observeCollection<T>(
   collection: ObservableCollection<T>,
   handlers: CollectionObserveHandlers<T>,
