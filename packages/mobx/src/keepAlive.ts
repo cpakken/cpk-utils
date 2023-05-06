@@ -1,8 +1,9 @@
 //https://github.com/mobxjs/mobx-utils/blob/master/src/keep-alive.ts
 
-import { noop } from '@cpk-utils/common'
 import { IComputedValue, getAtom, observe } from 'mobx'
 import type { Disposer } from './types'
+
+export const noop = () => {}
 
 export function keepAlive(target: Object, property: string): Disposer
 export function keepAlive(computedValue: IComputedValue<any>): Disposer

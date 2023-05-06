@@ -1,4 +1,4 @@
-import { addHiddenProp, Parameter } from '@cpk-utils/common'
+import { addHiddenProp } from './add-hidden-prop'
 import { computed, onBecomeUnobserved, IComputedValue } from 'mobx'
 
 //Used to identify transformer type
@@ -15,14 +15,14 @@ const $transformer = Symbol('transformer')
 
 export function createTransformer<FN extends (arg: any) => any>(
   transformer: FN,
-  options?: ITransformerOptions<Parameter<FN>, ReturnType<FN>>
+  options?: ITransformerOptions<Parameters<FN>[0], ReturnType<FN>>
 ): FN {
   if (!(typeof transformer === 'function' && transformer.length < 2))
     throw new Error('createTransformer expects a function that accepts one argument')
 
   const { requiresReaction = false, onCleanup, cache = new Map() } = options || { cache: new Map() }
 
-  function createView(source: Parameter<FN>) {
+  function createView(source: Parameters<FN>[0]) {
     let latestValue: ReturnType<FN>
     const expr = computed(() => (latestValue = transformer(source)), { requiresReaction })
     const disposer = onBecomeUnobserved(expr, () => {

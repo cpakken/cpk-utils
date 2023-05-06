@@ -1,4 +1,4 @@
-import { isFunction } from '@cpk-utils/common'
+import { isFunction } from '@cpk-utils/is'
 import { IObservableValue, _getAdministration } from 'mobx'
 import type { Disposer, MaybeDisposer } from './types'
 

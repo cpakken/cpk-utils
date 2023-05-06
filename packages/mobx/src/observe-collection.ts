@@ -16,7 +16,13 @@ import {
 } from 'mobx'
 import type { MaybeDisposer } from './types'
 
-export type KeyObservableCollection<V = any> = Record<string, V> | ObservableMap<any, V> | IObservableArray<V>
+// export type KeyObservableCollection<V = any> = Record<string, V> | ObservableMap<any, V> | IObservableArray<V>
+
+export type KeyObservableCollection<V = any> =
+  | { [key: string]: V }
+  | ObservableMap<any, V>
+  | IObservableArray<V>
+
 export type ObservableCollection<V = any> = KeyObservableCollection<V> | ObservableSet<V>
 
 export type IKeyCollectionDidChange<T> = ISetDidChange<T> | IMapDidChange<any, T> | IObjectDidChange<any>

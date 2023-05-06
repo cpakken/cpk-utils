@@ -1,4 +1,4 @@
-import { isPrimative } from '../common'
+import { isPrimative } from '@cpk-utils/is'
 
 type Cache = WeakMap<object, any>
 

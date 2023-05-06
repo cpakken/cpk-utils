@@ -1,0 +1,20 @@
+{
+  "name": "@cpk-utils/decorators",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "vitest --globals",
+    "build": "tsup"
+  },
+  "author": "Chris Pakken",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.1.0",
+    "tsup": "^6.7.0",
+    "vitest": "^0.31.0"
+  },
+  "dependencies": {}
+}

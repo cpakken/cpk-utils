@@ -1,7 +1,7 @@
 import { reaction } from 'mobx'
 import { MaybeDisposer } from './types'
 
-export interface IOnValidOptions<T> {
+export interface IOnValidOptions {
   // name?: string
   timeout?: number
   onError?: (error: any) => void

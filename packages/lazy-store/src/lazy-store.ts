@@ -1,5 +1,5 @@
 import { DerivedMap, ReadOnlyMapProps } from './derived-map'
-import { clearWeakMemo, weakMemo } from './weak-memoize'
+import { clearWeakMemo, weakMemo } from '@cpk-utils/memo'
 
 export class LazyMap<K, P, V> extends DerivedMap<K, P, V> {
   declare readonly mapFn: (parentValue: P) => V

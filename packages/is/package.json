@@ -1,0 +1,18 @@
+{
+  "name": "@cpk-utils/is",
+  "version": "0.0.1",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "scripts": {
+    "test": "vitest --globals",
+    "build": "tsup"
+  },
+  "author": "Chris Pakken",
+  "license": "MIT",
+  "devDependencies": {
+    "tsup": "^6.7.0",
+    "vitest": "^0.31.0"
+  }
+}
