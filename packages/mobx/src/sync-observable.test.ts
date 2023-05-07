@@ -19,6 +19,8 @@ test('syncObservable', () => {
   const syncObs = syncObservable<number>(syncHandler, reducer, 0)
 
   expect(syncObs.isActive).toBe(false)
+  expect(syncObs.peek()).toBe(0)
+  expect(syncObs.peekPrev()).toBe(undefined)
 
   const record = vi.fn()
   const autorunDisposer = autorun(() => {

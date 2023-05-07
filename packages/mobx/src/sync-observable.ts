@@ -34,9 +34,17 @@ type SyncActive<T> = {
 export class SyncObservable<S, V = S> {
   private active: SyncActive<V> | null = null
 
-  declare value: V
-  declare oldValue: V | undefined
+  private declare value: V
+  private declare oldValue: V | undefined
   isDisposed: boolean = false
+
+  peek() {
+    return this.value
+  }
+
+  peekPrev() {
+    return this.oldValue
+  }
 
   constructor(
     private onInit: (sink: (value: S, reportChanged?: boolean) => void, dispose: Disposer) => Disposer,

@@ -3,10 +3,9 @@
   "version": "0.0.1",
   "description": "Utility functions and common patterns for MobX",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "//types": "./src/index.ts",
   "files": [
     "src",
     "dist",
@@ -30,7 +29,7 @@
     "vitest": "^0.31.0"
   },
   "peerDependencies": {
-    "mobx": "^6.7.0"
+    "mobx": "^6.9.0"
   },
   "keywords": [
     "mobx",

@@ -6,6 +6,7 @@ export * from './sync-observable'
 export * from './actionx'
 export * from './createTransformer'
 export * from './keepAlive'
+export * from './on-valid'
 
 //Test Utils
 export * from './observable-recorder'
