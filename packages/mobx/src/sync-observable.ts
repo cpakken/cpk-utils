@@ -1,4 +1,7 @@
+import { Assert, createInvariant, isFunction } from '@cpk-utils/is'
 import { comparer, createAtom, IAtom, runInAction } from 'mobx'
+
+const invariant: Assert = createInvariant('mobx-utils/syncObservable')
 
 //Inspiration
 // https://github.com/mobxjs/mobx-utils/blob/master/src/from-resource.ts
@@ -18,6 +21,12 @@ type SyncActive<T> = {
   subscribers: Set<ValueChangeHandler<T>>
   // disposers: Array<Disposer>
   disposers: Map<ValueChangeHandler<T>, MaybeDisposer>
+}
+
+type SyncObservableOptions<S, V> = {
+  reducer?: ((accumulator: V, current: S) => V) | undefined
+  initialValue?: V | undefined
+  requiresReaction?: boolean
 }
 
 /**
@@ -46,12 +55,21 @@ export class SyncObservable<S, V = S> {
     return this.oldValue
   }
 
+  private declare onInit: (sink: (value: S, reportChanged?: boolean) => void, dispose: Disposer) => Disposer
+  private declare reducer?: (accumulator: V, current: S) => V
+  private declare initialValue?: V
+  private requiresReaction?: boolean = true
+
   constructor(
-    private onInit: (sink: (value: S, reportChanged?: boolean) => void, dispose: Disposer) => Disposer,
-    private reducer?: (accumulator: V, current: S) => V,
-    private initialValue?: V
+    // private onInit: (sink: (value: S, reportChanged?: boolean) => void, dispose: Disposer) => Disposer,
+    // private reducer?: (accumulator: V, current: S) => V,
+    // private initialValue?: V
+    init: {
+      onInit: (sink: (value: S, reportChanged?: boolean) => void, stop: Disposer) => Disposer
+    } & SyncObservableOptions<S, V>
   ) {
-    if (initialValue !== undefined) this.value = initialValue
+    Object.assign(this, init)
+    if (this.initialValue !== undefined) this.value = this.initialValue
   }
 
   private _next(nextValue: V, active: SyncActive<V> | null, reportChanged = true) {
@@ -76,7 +94,9 @@ export class SyncObservable<S, V = S> {
   }
 
   private createActive(): SyncActive<V> {
-    if (this.isDisposed) throw new Error('syncObservable has already been disposed')
+    // if (this.isDisposed) throw new Error('syncObservable has already been disposed')
+    invariant(!this.isDisposed, 'syncObservable has already been disposed')
+
     // if (this.active) throw new Error()
     if (this.active) return this.active
 
@@ -117,6 +137,7 @@ export class SyncObservable<S, V = S> {
     const { active } = this
 
     if (active) {
+      this.value = this.initialValue as V //reset value
       runInAction(() => {
         if (disposeSubscribers) {
           active.disposers.forEach((disposer) => disposer?.())
@@ -155,17 +176,24 @@ export class SyncObservable<S, V = S> {
     }
   }
 
-  val() {
+  val(): V {
     if (this.active) {
       this.active.atom.reportObserved()
       return this.value
     } else {
+      //Start reaction to get value
       this.active = this.createActive()
       if (this.active.atom.reportObserved()) {
+        //is in reaction (i.e. autorun(), reaction())
         return this.value
       } else {
-        throw new Error(`syncObservable.val() called outside of reaction/observer`)
-        //TODO just start active and stop immediately after returning, but onInit (sink) is not gauranteed to run immediately
+        const val = this.value
+        this.stop() //stop immediately after getting a single value
+
+        invariant(!this.requiresReaction, `REQUIRES REACTION: val() called outside of reaction/observer`)
+        invariant(val !== undefined, 'syncObservable.onInit did not call sink synchronously')
+
+        return val
       }
     }
   }
@@ -195,10 +223,17 @@ export function syncObservable<S, V = S>(
   initialValue?: V
 ): SyncObservable<S, V>
 
+export function syncObservable<S, V = S>(
+  onInit: (sink: (value: S, reportChanged?: boolean) => void, dispose: Disposer) => Disposer,
+  options: SyncObservableOptions<S, V>
+): SyncObservable<S, V>
+
 export function syncObservable<S, V>(
   onInit: (sink: (value: S, reportChanged?: boolean) => void, dispose: Disposer) => Disposer,
-  reducer?: (accumulator: V, current: S) => V,
-  initialValue?: V
+  reducerOrOptions?: ((accumulator: V, current: S) => V) | SyncObservableOptions<S, V>,
+  initialValue?: V | undefined
 ): SyncObservable<S, V> {
-  return new SyncObservable(onInit, reducer, initialValue)
+  return isFunction(reducerOrOptions)
+    ? new SyncObservable({ onInit, reducer: reducerOrOptions, initialValue })
+    : new SyncObservable({ onInit, ...reducerOrOptions })
 }
