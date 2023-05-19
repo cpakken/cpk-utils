@@ -10,4 +10,3 @@ export * from './on-valid'
 
 //Test Utils
 export * from './observable-recorder'
-export * from './autorun-test'

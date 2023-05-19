@@ -165,7 +165,7 @@ export class SyncObservable<S, V = S> {
         return this.value
       } else {
         throw new Error(`syncObservable.val() called outside of reaction/observer`)
-        //OR just start active and stop immediately after returning, but onInit (sink) is not gauranteed to run immediately
+        //TODO just start active and stop immediately after returning, but onInit (sink) is not gauranteed to run immediately
       }
     }
   }
