@@ -12,9 +12,9 @@
   "author": "Chris Pakken",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.1.0",
+    "@types/node": "^20.2.1",
     "tsup": "^6.7.0",
-    "vitest": "^0.31.0"
+    "vitest": "^0.31.1"
   },
   "dependencies": {
     "@cpk-utils/memo": "workspace:^"

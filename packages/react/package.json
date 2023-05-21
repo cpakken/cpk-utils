@@ -24,19 +24,19 @@
     "test": "vitest --globals"
   },
   "devDependencies": {
-    "@types/react": "^18.2.5",
+    "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "vite": "^4.3.5",
+    "vite": "^4.3.8",
     "vite-plugin-dts": "^2.3.0",
-    "vitest": "^0.31.0"
+    "vitest": "^0.31.1"
   },
   "peerDependencies": {
     "react": "^17"
   },
   "dependencies": {
     "@radix-ui/react-use-layout-effect": "^1.0.0",
-    "react-merge-refs": "^2.0.1"
+    "react-merge-refs": "^2.0.2"
   }
 }
