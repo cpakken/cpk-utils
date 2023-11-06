@@ -11,6 +11,6 @@
   "author": "Chris Pakken",
   "license": "MIT",
   "devDependencies": {
-    "turbo": "^1.9.8"
+    "turbo": "^1.10.16"
   }
 }

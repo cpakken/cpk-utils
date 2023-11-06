@@ -11,3 +11,6 @@ export const createInvariant = (label?: string): Assert => {
 // if "condition" is false will throw an error. This function is special-cased
 // in flow itself, so we can't name it anything else.
 export const invariant: Assert = createInvariant()
+
+//TODO see this instead
+//https://github.com/alexreardon/tiny-invariant/blob/master/src/tiny-invariant.ts
