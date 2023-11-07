@@ -3,7 +3,6 @@ import { isPrimative } from '@cpk-utils/is'
 type Cache = WeakMap<object, any>
 
 const $noArg = {}
-const $init = {}
 const memoFnCacheMap = new WeakMap<Function, Cache>()
 
 /**
@@ -12,12 +11,7 @@ const memoFnCacheMap = new WeakMap<Function, Cache>()
  * @returns memoized function
  */
 export function weakMemoDeep<FN extends (...args: any[]) => any>(fn: FN, _cache?: Cache): FN {
-  let cache: Cache
-  //Used to reset cache since .clear() is unavailable in WeakMap
-  const initCache = (_cache?: Cache) => {
-    cache = _cache || new WeakMap([[$init, initCache]])
-    memoFnCacheMap.set(memoized, cache)
-  }
+  let cache: Cache = _cache || new WeakMap()
 
   function memoized(...args: any[]) {
     const arg = args[0]
@@ -71,18 +65,10 @@ export function weakMemoDeep<FN extends (...args: any[]) => any>(fn: FN, _cache?
     }
   }
 
-  // memoFnCacheMap.set(memoized, cache)
-  initCache(_cache)
+  memoFnCacheMap.set(memoized, cache)
   return memoized as FN
 }
 
 export function isWeakMemoDeepFn(memoedFn: (...args: any[]) => any): boolean {
   return memoedFn && memoFnCacheMap.has(memoedFn)
-}
-
-//TODO test this
-export function clearWeakMemoDeep(fn: (...args: any[]) => any) {
-  if (isWeakMemoDeepFn(fn)) {
-    memoFnCacheMap.get(fn)!.get($init)()
-  }
 }

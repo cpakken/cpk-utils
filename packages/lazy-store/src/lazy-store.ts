@@ -1,16 +1,22 @@
 import { DerivedMap, ReadOnlyMapProps } from './derived-map'
-import { clearWeakMemo, weakMemo } from '@cpk-utils/memo'
+import { WeakMemo, weakMemo } from '@cpk-utils/memo'
 
-export class LazyMap<K, P, V> extends DerivedMap<K, P, V> {
-  declare readonly mapFn: (parentValue: P) => V
+export class LazyMap<K, P extends object, V> extends DerivedMap<K, P, V> {
+  declare readonly derive: WeakMemo<(value: P) => V>
 
   constructor(base: ReadOnlyMapProps<K, P>, mapFn: (parentValue: P) => V) {
-    super(base, weakMemo(mapFn))
+    const memoedFn = weakMemo(mapFn)
+    super(base, memoedFn)
   }
 
-  reset(...keyArg: [K] | []) {
-    //spread key since clearWeakMemo will clear all if it has no key
-    return clearWeakMemo(this.mapFn, ...keyArg.map((key: K) => this.base.get(key)! as any))
+  reset(key: K) {
+    const derivedKey = this.base.get(key)
+    if (!derivedKey) throw new Error(`Key ${key} not found in base map`)
+    return this.derive.delete(derivedKey)
+  }
+
+  clear() {
+    this.derive.clear()
   }
 }
 
