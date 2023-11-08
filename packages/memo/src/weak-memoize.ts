@@ -2,74 +2,23 @@ import { isPrimative } from '@cpk-utils/is'
 
 type Cache = WeakMap<object, any>
 
-// Used to access the cache of a memoized function
-const weakMemoedFnCache = new WeakMap<Function, Cache>()
+export type WeakMemo<FN extends (arg: any) => any> = FN & {
+  peek: (arg?: ArgType<FN>) => ReturnType<FN> | undefined
+  clear: (arg: ArgType<FN> | null) => boolean
+  reset: () => void
+}
 
-//Use object as key since symbol can't be a key in weakMap
-const $noArg = {}
-
-export type WeakMemo<FN extends (...args: any[]) => any> = FN extends () => any
-  ? {
-      (): ReturnType<FN>
-      peek: () => ReturnType<FN> | undefined
-      delete: () => void
-      clear: () => void
-    }
-  : FN extends (arg: infer A) => any
-  ? {
-      (arg: A): ReturnType<FN>
-      peek: (arg: A) => ReturnType<FN> | undefined
-      delete: (arg: A) => boolean
-      clear: () => void
-    }
-  : FN extends (arg?: infer A) => any
-  ? {
-      (arg?: A): ReturnType<FN>
-      peek: (arg?: A) => ReturnType<FN> | undefined
-      delete: (arg?: A) => boolean
-      clear: () => void
-    }
-  : never
+type ArgType<FN> = FN extends (arg: infer A) => any ? A : never
 
 /**
  * Weakly memoize a function with zero/one arguments. Caches the result if the argument is non-primative
  * @param fn function to be weakly memoized
  * @returns memoized function
  */
+export function weakMemo<FN extends (arg?: any) => any>(fn: FN): WeakMemo<FN> {
+  type A = ArgType<FN>
+  type T = ReturnType<FN>
 
-export function weakMemo<T>(fn: () => T): {
-  (): T
-  peek: () => T | undefined
-  delete: () => void
-  clear: () => void
-}
-
-export function weakMemo<A extends object, T>(
-  fn: (arg: A) => T
-): {
-  (arg: A): T
-  peek: (arg: A) => T | undefined
-  delete: (arg: A) => boolean
-  clear: () => void
-}
-
-export function weakMemo<A extends object, T>(
-  fn: (arg?: A) => T
-): {
-  (arg?: A): T
-  peek: (arg?: A) => T | undefined
-  delete: (arg?: A) => boolean
-  clear: () => void
-}
-
-export function weakMemo<A extends object, T>(
-  fn: (arg?: A) => T
-): {
-  (arg?: A): T
-  peek: (arg?: A) => T | undefined
-  delete: (arg?: A) => boolean
-  clear: () => void
-} {
   let cache = new WeakMap<A | typeof $noArg, T>()
 
   function memoedFn(arg?: any) {
@@ -106,10 +55,10 @@ export function weakMemo<A extends object, T>(
     peek(arg?: A) {
       return cache.get(arg === undefined ? $noArg : arg)
     },
-    delete(arg?: A) {
-      cache.delete(arg === undefined ? $noArg : arg)
+    clear(arg: A | null) {
+      cache.delete(arg === null ? $noArg : arg)
     },
-    clear() {
+    reset() {
       cache = new WeakMap()
       weakMemoedFnCache.set(memoedFn, cache)
     },
@@ -119,3 +68,9 @@ export function weakMemo<A extends object, T>(
 export function isWeakMemoFn(fn: (arg?: any) => any): boolean {
   return fn && weakMemoedFnCache.has(fn)
 }
+
+// Used to access the cache of a memoized function
+const weakMemoedFnCache = new WeakMap<Function, Cache>()
+
+//Use object as key since symbol can't be a key in weakMap
+const $noArg = {}

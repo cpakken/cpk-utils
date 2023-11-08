@@ -1,5 +1,5 @@
 import { Assert, createInvariant, isFunction } from '@cpk-utils/is'
-import { comparer, createAtom, IAtom, runInAction } from 'mobx'
+import { action, comparer, createAtom, IAtom, runInAction } from 'mobx'
 
 const invariant: Assert = createInvariant('mobx-utils/syncObservable')
 
@@ -14,13 +14,15 @@ type Disposer = () => void
 type MaybeDisposer = Disposer | void
 export type ValueChangeHandler<T> = (value: T, oldValue: T | undefined) => MaybeDisposer
 
-type SyncActive<T> = {
+type SyncActive<S, V> = {
   atom: IAtom
   isInReaction: boolean
   unsubscribe: Disposer
-  subscribers: Set<ValueChangeHandler<T>>
+  subscribers: Set<ValueChangeHandler<V>>
   // disposers: Array<Disposer>
-  disposers: Map<ValueChangeHandler<T>, MaybeDisposer>
+  disposers: Map<ValueChangeHandler<V>, MaybeDisposer>
+  sink: (next: S, reportChanged?: boolean) => void
+  setVal: (nextValue: V, reportChanged?: boolean) => void
 }
 
 type SyncObservableOptions<S, V> = {
@@ -28,6 +30,8 @@ type SyncObservableOptions<S, V> = {
   initialValue?: V | undefined
   requiresReaction?: boolean
 }
+
+const is = comparer.default
 
 /**
  * Alternative to computed, features from from-resource but has observe api that can perform state changes in the same transaction
@@ -41,7 +45,7 @@ type SyncObservableOptions<S, V> = {
  * only use in low-level libraries or when you know what you are doing
  */
 export class SyncObservable<S, V = S> {
-  private active: SyncActive<V> | null = null
+  private active: SyncActive<S, V> | null = null
 
   private declare value: V
   private declare oldValue: V | undefined
@@ -75,28 +79,7 @@ export class SyncObservable<S, V = S> {
     if (this.initialValue !== undefined) this.value = this.initialValue
   }
 
-  private _next(nextValue: V, active: SyncActive<V> | null, reportChanged = true) {
-    if (!comparer.default(nextValue, this.value)) {
-      this.oldValue = this.value
-      this.value = nextValue
-
-      if (active) {
-        //TODO runInAction probably is not needed... if true, remove
-        runInAction(() => {
-          if (reportChanged) active.atom.reportChanged()
-          active.disposers.forEach((disposer) => disposer?.())
-
-          active.disposers = new Map(
-            Array.from(active.subscribers, (subscriber) => {
-              return [subscriber, subscriber(this.value, this.oldValue)]
-            })
-          )
-        })
-      }
-    }
-  }
-
-  private createActive(): SyncActive<V> {
+  private createActive(): SyncActive<S, V> {
     // if (this.isDisposed) throw new Error('syncObservable has already been disposed')
     invariant(!this.isDisposed, 'syncObservable has already been disposed')
 
@@ -104,12 +87,37 @@ export class SyncObservable<S, V = S> {
     if (this.active) return this.active
 
     const { reducer } = this
+
     const getNextValue = reducer ? (next: S) => reducer(this.value, next) : (next: S) => next
 
-    const onChange = (next: S, reportChanged = true) => {
+    //TODO do we need to wrap in action?
+    const reportSubscribers = action((reportChanged: boolean) => {
+      if (reportChanged) active.atom.reportChanged()
+
+      active.disposers.forEach((disposer) => disposer?.())
+
+      active.disposers = new Map(
+        Array.from(active.subscribers, (subscriber) => {
+          return [subscriber, subscriber(this.value, this.oldValue)]
+        })
+      )
+    })
+
+    const setVal = (nextValue: V, reportChanged = true) => {
+      if (!is(nextValue, this.value)) {
+        this.oldValue = this.value
+        this.value = nextValue
+
+        if (active) {
+          reportSubscribers(reportChanged)
+        }
+      }
+    }
+
+    const sink = (next: S, reportChanged = true) => {
       // const nextValue = (this.reducer ? this.reducer(this.value, next) : next) as V
       const nextValue = getNextValue(next) as V
-      this._next(nextValue, active, reportChanged)
+      setVal(nextValue, reportChanged)
     }
 
     const onBecomeObserved = () => {
@@ -122,16 +130,18 @@ export class SyncObservable<S, V = S> {
       }
     }
 
-    const active: SyncActive<V> = {
+    const active: SyncActive<S, V> = {
       atom: createAtom('sync-observable', onBecomeObserved, onBecomeUnobserved),
       //@ts-ignore
       unsubscribe: undefined, //run onInit after active is initialized
       subscribers: new Set(),
       disposers: new Map(),
       isInReaction: false,
+      sink,
+      setVal,
     }
 
-    active.unsubscribe = this.onInit(onChange, this.dispose.bind(this))
+    active.unsubscribe = this.onInit(sink, this.dispose.bind(this))
 
     return active
   }
@@ -220,7 +230,8 @@ export class SyncObservable<S, V = S> {
    */
   reset(val?: V, reportChanged = true) {
     const nextValue = val ?? this.initialValue
-    if (nextValue !== undefined) this._next(nextValue, this.active, reportChanged)
+    if (nextValue !== undefined) this.active?.setVal(nextValue, reportChanged)
+    // if (nextValue !== undefined) this._next(nextValue, this.active, reportChanged)
   }
 
   dispose() {

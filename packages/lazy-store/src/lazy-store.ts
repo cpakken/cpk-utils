@@ -9,14 +9,14 @@ export class LazyMap<K, P extends object, V> extends DerivedMap<K, P, V> {
     super(base, memoedFn)
   }
 
-  reset(key: K) {
+  clear(key: K) {
     const derivedKey = this.base.get(key)
     if (!derivedKey) throw new Error(`Key ${key} not found in base map`)
-    return this.derive.delete(derivedKey)
+    return this.derive.clear(derivedKey)
   }
 
-  clear() {
-    this.derive.clear()
+  reset() {
+    this.derive.reset()
   }
 }
 

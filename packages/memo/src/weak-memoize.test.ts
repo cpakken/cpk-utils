@@ -29,15 +29,24 @@ test('memoize one argument', () => {
 
   expect(add3).toBeCalledTimes(1)
 
-  add3memoed.delete(obj)
+  add3memoed.clear(obj)
   add3memoed(obj)
   expect(add3).toBeCalledTimes(2)
 
-  add3memoed.clear()
+  add3memoed.reset()
   add3memoed(obj)
   expect(add3).toBeCalledTimes(3)
 
   const peeked = add3memoed.peek({ val: 2 })
   expect(peeked).toEqual(undefined)
   expect(add3).toBeCalledTimes(3)
+})
+
+test('preserve types', () => {
+  function buffer<T extends { id: any }>(FOO: T): T {
+    return FOO
+  }
+
+  const memoedBuffer = weakMemo(buffer)
+  const obj = memoedBuffer<{ id: string }>({ id: '1' })
 })
