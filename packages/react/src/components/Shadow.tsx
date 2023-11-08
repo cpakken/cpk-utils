@@ -1,6 +1,14 @@
-import { createElement, CSSProperties, forwardRef, ReactNode, useLayoutEffect, useRef, useState } from 'react'
+import {
+  createElement,
+  CSSProperties,
+  forwardRef,
+  ReactNode,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import { createPortal } from 'react-dom'
-import mergeRefs from 'react-merge-refs'
+import { mergeRefs } from 'react-merge-refs'
 
 interface ShadowPortalProps {
   children: ReactNode

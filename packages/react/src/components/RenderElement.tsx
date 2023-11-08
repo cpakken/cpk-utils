@@ -1,5 +1,5 @@
 import { ComponentPropsWithoutRef, CSSProperties, forwardRef, useLayoutEffect, useRef } from 'react'
-import mergeRefs from 'react-merge-refs'
+import { mergeRefs } from 'react-merge-refs'
 
 type RenderElementProps = {
   el: HTMLElement

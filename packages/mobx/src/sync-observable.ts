@@ -55,7 +55,10 @@ export class SyncObservable<S, V = S> {
     return this.oldValue
   }
 
-  private declare onInit: (sink: (value: S, reportChanged?: boolean) => void, dispose: Disposer) => Disposer
+  private declare onInit: (
+    sink: (value: S, reportChanged?: boolean) => void,
+    dispose: Disposer
+  ) => Disposer
   private declare reducer?: (accumulator: V, current: S) => V
   private declare initialValue?: V
   private requiresReaction?: boolean = true
@@ -100,8 +103,12 @@ export class SyncObservable<S, V = S> {
     // if (this.active) throw new Error()
     if (this.active) return this.active
 
+    const { reducer } = this
+    const getNextValue = reducer ? (next: S) => reducer(this.value, next) : (next: S) => next
+
     const onChange = (next: S, reportChanged = true) => {
-      const nextValue = (this.reducer ? this.reducer(this.value, next) : next) as V
+      // const nextValue = (this.reducer ? this.reducer(this.value, next) : next) as V
+      const nextValue = getNextValue(next) as V
       this._next(nextValue, active, reportChanged)
     }
 
@@ -151,6 +158,12 @@ export class SyncObservable<S, V = S> {
     }
   }
 
+  /**
+   *
+   * @param subscriber
+   * @param runImmediately @default true
+   * @returns
+   */
   subscribe(subscriber: ValueChangeHandler<V>, runImmediately = true): () => void {
     this.active ||= this.createActive()
 
@@ -190,7 +203,10 @@ export class SyncObservable<S, V = S> {
         const val = this.value
         this.stop() //stop immediately after getting a single value
 
-        invariant(!this.requiresReaction, `REQUIRES REACTION: val() called outside of reaction/observer`)
+        invariant(
+          !this.requiresReaction,
+          `REQUIRES REACTION: val() called outside of reaction/observer`
+        )
         invariant(val !== undefined, 'syncObservable.onInit did not call sink synchronously')
 
         return val
