@@ -4,9 +4,8 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   plugins: [
     dts({
-      outputDir: './dist/types',
+      outDir: './dist/types',
       entryRoot: './src',
-      skipDiagnostics: false,
       exclude: ['**/vite-env.d.ts'],
     }),
   ],

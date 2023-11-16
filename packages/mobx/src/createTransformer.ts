@@ -1,9 +1,11 @@
 import { addHiddenProp } from './add-hidden-prop'
 import { computed, onBecomeUnobserved, IComputedValue } from 'mobx'
 
-//Used to identify transformer type
+//derived from https://github.com/mobxjs/mobx-utils/blob/362cbbfb384820d416f253eddc532ebecba89bcb/src/create-transformer.ts
 
-export type TransformerCacheMap<A, B> = Map<A, IComputedValue<B>>
+type TransformerCacheMap<A, B> = A extends object
+  ? WeakMap<A, IComputedValue<B>>
+  : Map<A, IComputedValue<B>>
 
 interface ITransformerOptions<A, B> {
   onCleanup?(result: B, source: A): void
@@ -11,8 +13,17 @@ interface ITransformerOptions<A, B> {
   cache?: TransformerCacheMap<A, B>
 }
 
-const $transformer = Symbol('transformer')
-
+export function createTransformer<FN extends (arg: any) => any>(
+  transformer: FN,
+  options?: ITransformerOptions<
+    Parameters<FN>[0] extends object ? Parameters<FN>[0] : Parameters<FN>[0],
+    ReturnType<FN>
+  >
+): FN
+export function createTransformer<FN extends (arg: any) => any>(
+  transformer: FN,
+  options?: ITransformerOptions<Parameters<FN>[0], ReturnType<FN>>
+): FN
 export function createTransformer<FN extends (arg: any) => any>(
   transformer: FN,
   options?: ITransformerOptions<Parameters<FN>[0], ReturnType<FN>>
@@ -20,7 +31,7 @@ export function createTransformer<FN extends (arg: any) => any>(
   if (!(typeof transformer === 'function' && transformer.length < 2))
     throw new Error('createTransformer expects a function that accepts one argument')
 
-  const { requiresReaction = false, onCleanup, cache = new Map() } = options || { cache: new Map() }
+  const { requiresReaction = false, onCleanup, cache = new Map() } = options || {}
 
   function createView(source: Parameters<FN>[0]) {
     let latestValue: ReturnType<FN>
@@ -53,3 +64,5 @@ export function createTransformer<FN extends (arg: any) => any>(
 export function isTransformer(fn: (arg: any) => any): boolean {
   return Boolean(fn[$transformer])
 }
+
+const $transformer = Symbol('transformer')
